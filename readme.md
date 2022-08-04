@@ -3,6 +3,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
+
 ## Introduction
 
 This repository `nx_open` contains **Network Optix Meta Platform open source components** - the
@@ -18,9 +19,11 @@ Most of the source code and other files are licensed under the terms of Mozilla 
 `licenses/` directory in the root directory of the repository.
 
 ---------------------------------------------------------------------------------------------------
+
 ## Build environment
 
 Currently the following platforms and architectures are supported by this repository:
+
 - Windows x64 (Microsoft Visual Studio).
 - Linux x64 (GCC or Clang).
 - Linux 64-bit ARM (cross-compiling on Linux x64, GCC or Clang).
@@ -38,21 +41,23 @@ NOTE: Certain Components in this repository can be built using more platforms an
 the Nx Kit library (`artifacts/nx_kit/`).
 
 Pre-requisites per platform (the details are given in the further subsections):
+
 - CMake 3.19.0+ (on Windows, comes with Microsoft Visual Studio).
-- Ninja (on Windows, comes with Miscosoft Visual Studio).
+- Ninja (on Windows, comes with Microsoft Visual Studio).
 - Python 3.8+.
 - Conan 1.43.x.
 - **Linux:**
-    - `chrpath`.
-    - Certain packages for the build dependencies.
+  - `chrpath`.
+  - Certain packages for the build dependencies.
 - **Windows:** Microsoft Visual Studio 2022, Community Edition.
-    - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
+  - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
         but its support may be dropped in further branches like `vms_5.0_patch`.
 - **MacOS**:
-    - Xcode 12.5.
-    
+  - Xcode 12.5.
+
 **MacOS**: for easy installation of further build prerequisites, install Homebrew:
-```
+
+```console
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
 brew update
 ```
@@ -62,61 +67,89 @@ brew update
 The Components use CMake as a build system. CMake 3.19.0+ must be installed (the latest stable
 version is recommended) and be available on `PATH` as `cmake`.
 
-- **Linux**: either from https://cmake.org/download/, or from the official Kitware APT repository
-    for Ubuntu (https://apt.kitware.com/). It is recommended to completely remove
+- **Linux**: either from <https://cmake.org/download/>, or from the official Kitware APT repository
+    for Ubuntu (<https://apt.kitware.com/>). It is recommended to completely remove
     (`apt purge -y --auto-remove cmake`) the CMake package from the Main repository before
     installing the one from the Kitware repository.
 - **Windows**: CMake which comes with Microsoft Visual Studio is suitable. If desired, a
-    standalone installation of CMake can be performed from https://cmake.org/download/; after
+    standalone installation of CMake can be performed from <https://cmake.org/download/>; after
     installing, choose "Add CMake to the system PATH for all users" and add the path to `cmake.exe`
     to `CMakeSettings.json` (see the "Building and debugging in Visual Studio" section of this
     guide).
-    - ATTENTION: If you use Cygwin, make sure the Cygwin's `cmake` is not on `PATH`.
-- **MacOS**: Download and install the latest stable CMake version from https://cmake.org/download/.
+  - ATTENTION: If you use Cygwin, make sure the Cygwin's `cmake` is not on `PATH`.
+- **MacOS**: Download and install the latest stable CMake version from <https://cmake.org/download/>.
 
 ### Python
 
 Python 3.8+ should be installed and available on `PATH` either as `python` or `python3`, and for
 **MacOS** - as `python3.<minor>`. In this guide we assume its main command is `python`.
 
-- **Windows**: a Windows-native (non-Cygwin) version of Python should be installed. A Cygwin
-    version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes
-    it not visible to Windows-native programs including `cmake`).
+- **Windows**:
+  - A Windows-native (non-Cygwin) version of Python should be installed. A Cygwin version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes it not visible to Windows-native programs including `cmake`).
+  - An easy way to install Python on Windows 10 or 11 is to install Python 3.9 or later from the Windows Store.
 - **Linux**:
-    - `distutils` and `pip` must be installed explicitly:
-        ```
-        sudo apt install python3-distutils python3-pip
-        ```
-    - **Ubuntu 18**: Make sure that the right version of Python is installed. First, check the
-        currently installed version of `python3`:
-        ```
-        python3 --version
-        ```
-        If the version is lower than 3.8, update it:
-        ```
-        sudo apt install python3.8
-        sudo rm /usr/bin/python3
-        sudo ln -s /usr/bin/python3.8 /usr/bin/python3
-        ```
-- **MacOS**:
+  - `distutils` and `pip` must be installed explicitly:
+
+    ```console
+    sudo apt install python3-distutils python3-pip
     ```
+
+  - **Ubuntu 18**: Make sure that the right version of Python is installed. First, check the
+        currently installed version of `python3`:
+
+    ```console
+    python3 --version
+    ```
+
+  - If the version is lower than 3.8, update it:
+
+      ```console
+      sudo apt install python3.8
+      sudo rm /usr/bin/python3
+      sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+      ```
+
+- **MacOS**:
+
+    ```console
     brew install python3.9
     python3.9 -m ensurepip
-    ```    
-- Python module `pyaml` should be installed into Python:
     ```
+
+- Python module `pyaml` should be installed into Python:
+
+    ```console
     python -m pip install pyaml
     ```
 
 ### Conan
 
 Conan 1.43.x should be installed. It is recommended to install Conan by Python's `pip`:
+
 - **Windows:**
-    ```
+  - Install Conan:
+
+    ```console
     python -m pip install markupsafe==2.0.1 conan==1.43.2
+    pip --version
+    pip 22.2.2 from C:\Users\[some user]\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\pip (python 3.9)
     ```
+
+  - Add Conan to the User Account PATH variable:
+    - Launch the System Properties window, e.g. type "Edit environment variables for your account" in the Windows Start menu, and click the open link.
+    - The actual path variable will depend on the local install directory of Python and PIP, e.g. run `pip --version` to get the path.
+    - Add the `Scripts` path to the PATH environment variable, e.g. `[some path]\Python39\Scripts`
+    - You may need to logout and log back in to have the new PATH take affect.
+    - Test by running `conan` in a cmd shell.
+
+        ```console
+        > conan --version
+        Conan version 1.43.2
+        ```
+
 - **Linux:**
-    ```
+
+    ```console
     python3 -m pip install markupsafe==2.0.1 conan==1.43.2
     ```
 
@@ -139,70 +172,81 @@ directory `conan_cache/` next to the repository root and the build directories.
     **Individual components**, "C++ CMake tools for Windows" is selected.
 
 - **Linux**:
-    - Install the `chrpath` tool.
+  - Install the `chrpath` tool.
+
+    ```console
+    sudo apt install chrpath
+    ```
+
+  - Install Ninja build tool using either way:
+    - From <https://ninja-build.org/>; make sure `ninja` is on `PATH`.
+    - **Ubuntu**: Install via apt:
+
+        ```console
+        sudo apt install ninja-build
         ```
-        sudo apt install chrpath
+
+    - **MacOS**: Install via Homebrew:
+
+        ```console
+        brew install ninja
         ```
-    - Install Ninja build tool using either way:
-        - From https://ninja-build.org/; make sure `ninja` is on `PATH`.
-        - **Ubuntu**: Install via apt:
-            ```
-            sudo apt install ninja-build
-            ```
-        - **MacOS**: Install via Homebrew:
-            ```
-            brew install ninja
-            ```
-    - Install the following build and runtime dependencies:
-        - zlib: `zlib1g-dev`
-        - OpenAL: `libopenal-dev`
-        - Mesa 3D: `mesa-common-dev`
-        - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
-        - Mesa 3D GLU: `libglu1-mesa-dev`
-        - LDAP: `libldap2-dev`
-        - Xfixes: `libxfixes-dev` (used for cursors)
-        - X11 Screen Saver extension library: `libxss-dev`
-        - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
-        - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
-        - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
-        - Zip archiver: `zip` (command, required for ARM distribution building)
-        - Pkg-config: `pkg-config`
-        - Autoconf: `autoconf`
-        - X C Binding, xinerama extension: `libxcb-xinerama0`
+
+  - Install the following build and runtime dependencies:
+    - zlib: `zlib1g-dev`
+    - OpenAL: `libopenal-dev`
+    - Mesa 3D: `mesa-common-dev`
+    - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
+    - Mesa 3D GLU: `libglu1-mesa-dev`
+    - LDAP: `libldap2-dev`
+    - Xfixes: `libxfixes-dev` (used for cursors)
+    - X11 Screen Saver extension library: `libxss-dev`
+    - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
+    - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
+    - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
+    - Zip archiver: `zip` (command, required for ARM distribution building)
+    - Pkg-config: `pkg-config`
+    - Autoconf: `autoconf`
+    - X C Binding, xinerama extension: `libxcb-xinerama0`
 
         A typical command to install all of the above via apt:
-        ```
+
+        ```console
         sudo apt install zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
             libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
             libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0
         ```
-    - **Ubuntu 20+**: Install `libtinfo5` library:
-        ```
-        sudo apt install -y libtinfo5
-        ```
+
+  - **Ubuntu 20+**:
+    - Install `libtinfo5` library:
+
+      ```console
+      sudo apt install -y libtinfo5
+      ```
 
 - **MacOS**:
-    - Install the latest Xcode from AppStore.
-    - Install the following build dependencies:
-        - zlib: `zlib1g-dev`
-        - OpenAL: `libopenal-dev`
-        - Mesa 3D: `mesa-common-dev`
-        - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
-        - Mesa 3D GLU: `libglu1-mesa-dev`
-        - LDAP: `libldap2-dev`
-        - Xfixes: `libxfixes-dev` (used for cursors)
-        - X11 Screen Saver extension library: `libxss-dev`
-        - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
-        - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
-        - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
-        
-        A typicall command to install all of the above via Homebew:
-        ```
-            brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
-                libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
-        ```
-    
+  - Install the latest Xcode from AppStore.
+  - Install the following build dependencies:
+    - zlib: `zlib1g-dev`
+    - OpenAL: `libopenal-dev`
+    - Mesa 3D: `mesa-common-dev`
+    - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
+    - Mesa 3D GLU: `libglu1-mesa-dev`
+    - LDAP: `libldap2-dev`
+    - Xfixes: `libxfixes-dev` (used for cursors)
+    - X11 Screen Saver extension library: `libxss-dev`
+    - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
+    - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
+    - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
+  - A typical command to install all of the above via Homebrew:
+
+    ```console
+    brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
+        libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
+    ```
+
 ---------------------------------------------------------------------------------------------------
+
 ## Using CMake
 
 We recommend doing out-of-source builds with CMake – the source code folder (VCS folder) remains
@@ -210,6 +254,7 @@ intact, and all build results go into a dedicated folder. E.g. sources are in `n
 goes to `nx_open-build/`.
 
 With CMake, building is done in two stages:
+
 - Generation stage: performed by cmake.
 - Build stage: performed by a build tool chosen at the Generation stage - we use `ninja` for both
     Linux and Windows platforms. Can be also invoked via the CMake executable.
@@ -223,6 +268,7 @@ initial cloning of the repository.
 ### Under the hood
 
 During the Build stage the following things happen:
+
 1. Pre-build actions are executed. The script `ninja_tool.py` reads the file `pre_build.ninja_tool`
     in the build directory and executes the commands from this file. The exact command list depends
     on the build platform and generation options and can include:
@@ -237,6 +283,7 @@ During the Build stage the following things happen:
     stage again.
 
 ---------------------------------------------------------------------------------------------------
+
 ## Building VMS Desktop Client
 
 To build the Client, besides cloning this repository, you must obtain a Customization Package -
@@ -244,7 +291,7 @@ it is a collection of texts and graphics used in the GUI; it defines the brandin
 Customization Package comes as a zip file.
 
 If you want to build an Nx-Meta-branded VMS Client, download the Nx Meta customization package from
-https://meta.nxvms.com/. Otherwise, download a different Powered-by-Nx customization package using
+<https://meta.nxvms.com/>. Otherwise, download a different Powered-by-Nx customization package using
 the corresponding Developer account.
 
 All the commands necessary to perform the CMake Configuration and Build stages are written in the
@@ -269,22 +316,26 @@ attempt of running the build script.
 Below are the usage examples, where `<build>` is `./build.sh` on Linux and `build.bat` on Windows.
 
 - To make a clean Debug build, delete the build directory (if any), and run the command:
-    ```
+
+    ```console
     <build> -DcustomizationPackageFile=<customization.zip>
     ```
+
     The built executables will be placed in `nx_open-build/bin/`.
 
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
-    ```
+
+    ```console
     <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithTests=ON -DwithUnitTestsArchive=ON
     ```
+
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
     executables in it either one-by-one, or in parallel.
 
 - To perform an incremental build after some changes, run the `<build>` script without arguments.
-    - Note that there is no need to explicitly call the generation stage after adding/deleting
+  - Note that there is no need to explicitly call the generation stage after adding/deleting
         source files or altering the build system files, because `ninja_tool.py` properly
         handles such cases - the generation stage will be called automatically when needed.
 
@@ -296,7 +347,8 @@ x64 Native Tools Command Prompt`. Do not use the Visual Studio Command Prompt av
 Visual Studio main menu, because it sets up the environment for the 32-bit compiler and linker.
 
 For **cross-compiling** on Linux or MacOS, set the CMake variable `<targetDevice>`: add the
-argument `-DtargetDevice=<value>`, where <value> is one of the following:
+argument `-DtargetDevice=<value>`, where `<value>` is one of the following:
+
 - `linux_x64`
 - `linux_arm64`
 - `linux_arm32`
@@ -304,6 +356,7 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `macos_arm64`
 
 ---------------------------------------------------------------------------------------------------
+
 ## Signing executable files
 
 - **Windows**:
@@ -314,20 +367,20 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 
     Signing is performed by the `signtool.py` script which is a wrapper around native Windows
     `signtool.exe`. To enable signing, the following preparation steps must be done:
-    - Save the publisher certificate file somewhere in your file system.
-    - Create (preferably outside of the source tree) the configuration file. This file must contain
+  - Save the publisher certificate file somewhere in your file system.
+  - Create (preferably outside of the source tree) the configuration file. This file must contain
         the following fields:
-        - `file`: the path to the publisher certificate file. It must be either an absolute path or
+    - `file`: the path to the publisher certificate file. It must be either an absolute path or
             a path relative to the directory where the configuration file resides.
-        - `password`: the password protecting the publisher certificate file.
-        - `timestamp_servers` (optional): a list of the URLs of the trusted timestamping server. If
+    - `password`: the password protecting the publisher certificate file.
+    - `timestamp_servers` (optional): a list of the URLs of the trusted timestamping server. If
             this field is present in the configuration file, the signed file will be time-stamped
             using one of the listed servers. If this field is absent, the signed file will not be
             time-stamped.
 
         The example of a configuration file can be found in
         `open/build_utils/signtool/config/config.yaml`.
-    - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
+  - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
     this argument is missing, no signing will be performed.
 
     Also you can sign any file manually by calling `signtool.py` directly:
@@ -342,14 +395,15 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - **Linux**:
 
     Signing is not required; no tools or instructions are provided.
-    
+
 - **MacOS**:
 
     A signing tool suitable for standalone use is being developed and will likely be provided in
     the future. As for now, you can use your regular signing procedure that you involve for your
     other MacOS developments.
-    
+
 ---------------------------------------------------------------------------------------------------
+
 ## Running VMS Desktop Client
 
 The VMS Desktop Client can be run directly from the build directory, without installing a
@@ -362,12 +416,15 @@ For **Linux** and **MacOS**, just run the Desktop Client executable.
 
 For **Windows**, before running the Desktop Client executable, add the directory of the Qt library
 to the `PATH`:
-```
+
+```console
 set PATH=%PATH%;<qt_library_directory>/bin
 ```
+
 Note the `/bin` ending appended to the Qt library directory. The Qt library directory can be found
 in the generated file `nx_open-build/conan_paths.cmake, in the line looking like:
-```
+
+```console
 set(CONAN_QT_ROOT ...)
 ```
 
@@ -408,6 +465,7 @@ standard, so that the automatic updates will work with a custom VMS built from o
 future, instructions and/or tools for this will likely be provided.
 
 ---------------------------------------------------------------------------------------------------
+
 ## Building and debugging in Visual Studio
 
 On Windows, besides the command-line way described above, you can use the Visual Studio IDE to
@@ -474,6 +532,7 @@ it immediately, or "Set As Startup Item" to allow running it using the green tri
 in the toolbar at the top of the main Visual Studio window.
 
 ---------------------------------------------------------------------------------------------------
+
 ## Free and Open-Source Software Notices
 
 The Network Optix VMS Open Source Components software incorporates, depends upon, interacts with,
