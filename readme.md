@@ -49,18 +49,18 @@ Pre-requisites per platform (the details are given in the further subsections):
 - **Linux:**
   - `chrpath`.
   - Certain packages for the build dependencies.
-- **Windows:** Microsoft Visual Studio 2022, Community Edition.
+- **Windows:**
+  - Microsoft Visual Studio 2022, Community Edition.
   - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
         but its support may be dropped in further branches like `vms_5.0_patch`.
 - **MacOS**:
   - Xcode 12.5.
+  - For easy installation of further build prerequisites, install Homebrew:
 
-**MacOS**: for easy installation of further build prerequisites, install Homebrew:
-
-```console
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
-brew update
-```
+    ```console
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
+    brew update
+    ```
 
 ### CMake
 
