@@ -167,7 +167,8 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action, QString cloudSystemId)
 {
-    NX_VERBOSE(this, "Received action: %1, id: %2", action->type(), action->id());
+    NX_VERBOSE(this, "Received action: %1, id: %2, system: %3",
+        action->type(), action->id(), cloudSystemId);
 
     EventData eventData;
     eventData.id = action->id();
@@ -181,6 +182,11 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
+
+    eventData.objectTrackId = action->objectTrackId();
+    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
+        action->objectTypeId(),
+        action->attributes());
 
     setupClientAction(action.get(), eventData);
 

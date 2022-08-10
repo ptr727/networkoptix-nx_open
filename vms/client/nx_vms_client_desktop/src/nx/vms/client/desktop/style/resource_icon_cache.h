@@ -36,6 +36,7 @@ public:
         ExportedEncryptedLayout,
         SharedLayout,
         CloudLayout,
+        IntercomLayout,
         Layouts,
         SharedLayouts,
         LayoutTour,
@@ -43,6 +44,7 @@ public:
 
         Camera,
         VirtualCamera,
+        CrossSystemStatus,
         Cameras,
 
         Recorder,

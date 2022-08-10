@@ -17,7 +17,6 @@
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
@@ -33,6 +32,7 @@
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
@@ -675,11 +675,8 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
 
 SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
 {
-    for (auto systemContext: d->systemContexts)
-    {
-        if (systemContext->moduleInformation().cloudSystemId == cloudSystemId)
-            return systemContext;
-    }
+    if (const auto cloudContext = d->cloudCrossSystemManager->systemContext(cloudSystemId))
+        return cloudContext->systemContext();
 
     return nullptr;
 }

@@ -545,13 +545,10 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             if (activationType != ResourceTree::ActivationType::doubleClick)
                 return;
 
-            const QString systemId = index.data(Qn::CloudSystemIdRole).toString();
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!NX_ASSERT(context))
-                return;
-
-            if (context->status() == CloudCrossSystemContext::Status::connectionFailure)
-                context->initializeConnectionWithUserInteraction();
+            const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
+            d->context->menu()->trigger(
+                ui::action::ConnectToCloudSystemWithUserInteractionAction,
+                {Qn::CloudSystemIdRole, systemId});
 
             break;
         }
@@ -597,7 +594,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         {
             const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             // Do not open users or fake servers.
-            if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
+            if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake_server))
                 break;
 
             // Do not open servers of admin.

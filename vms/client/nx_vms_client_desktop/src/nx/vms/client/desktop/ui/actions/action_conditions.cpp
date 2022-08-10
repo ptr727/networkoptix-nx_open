@@ -41,6 +41,8 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
@@ -56,6 +58,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -614,6 +617,9 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
             if (!resource || !resource->resourcePool())
                 return false;
 
+            if (nx::vms::common::isIntercomLayout(resource))
+                return false;
+
             if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
             {
                 if (ownResources)
@@ -750,9 +756,36 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
 
 ActionVisibility LayoutItemRemovalCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
 {
-    foreach(const QnLayoutItemIndex &item, layoutItems)
+    for (const QnLayoutItemIndex& item: layoutItems)
+    {
         if (!context->accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
             return InvisibleAction;
+
+        const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
+        const auto resource = context->resourcePool()->getResourceById<QnResource>(resourceId);
+
+        if (nx::vms::common::isIntercomOnIntercomLayout(resource, item.layout()))
+        {
+            const QnUuid intercomToDeleteId = resource->getId();
+
+            QSet<QnUuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
+
+            const auto intercomLayoutItems = item.layout()->getItems();
+            for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
+            {
+                const auto itemResourceId = intercomLayoutItem.resource.id;
+                if (itemResourceId == intercomToDeleteId && intercomLayoutItem.uuid != item.uuid())
+                    intercomLayoutItemIds.insert(intercomLayoutItem.uuid);
+            }
+
+            for (const QnLayoutItemIndex& item: layoutItems)
+                intercomLayoutItemIds.remove(item.uuid());
+
+            // If all intercom copies on the layout is selected - removal is forbidden.
+            if (intercomLayoutItemIds.isEmpty())
+                return InvisibleAction;
+        }
+    }
 
     return EnabledAction;
 }
@@ -2322,6 +2355,21 @@ ConditionWrapper isCloudLayout(bool useCurrentLayout)
     }
 
     return new ResourceCondition(isCloud, MatchMode::All);
+}
+
+ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext*)
+        {
+            const auto systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
+            const auto cloudContext =
+                appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            return cloudContext && cloudContext->status()
+                == CloudCrossSystemContext::Status::connectionFailure;
+        }
+    );
 }
 
 } // namespace condition
